@@ -1,7 +1,14 @@
-<form action="/home/search" method="post" class="search-form">
-  <input type="text" name="searchedPlace" placeholder="Locate any place..." class="search-input" required>
+<form id="searchForm" class="search-form">
+  <input type="text" id="searchedPlace" placeholder="Locate any place..." class="search-input" required>
   <button type="submit" class="search-btn">Search</button>
 </form>
+
+
+<div class="map_temp">
+  <div id="map"></div>
+</div>
+
+<!-- CARDS SECTION -->
 <div class="cards-container">
 
   <a href="/home/viewHeatMap" class="card" style="width: 18rem; text-decoration: none; color: black;">
@@ -13,7 +20,7 @@
     </div>
   </a>
 
-  <a href="/home/compareCities"  class="card" style="width: 18rem; text-decoration: none; color: black;">
+  <a href="/home/compareCities" class="card" style="width: 18rem; text-decoration: none; color: black;">
     <img src="/images/2.png" class="card-img-top" alt="...">
     <div class="card-body">
       <h6>Compare Cities</h6>
@@ -22,7 +29,7 @@
     </div>
   </a>
 
-  <a href="/home/timeLine"  class="card" style="width: 18rem;text-decoration: none; color: black;">
+  <a href="/home/timeLine" class="card" style="width: 18rem;text-decoration: none; color: black;">
     <img src="images/3.png" class="card-img-top" alt="...">
     <div class="card-body">
       <h6>Evolution Timeline of your city</h6>
@@ -31,7 +38,7 @@
     </div>
   </a>
 
-  <a href="/home/similarProgs"  class="card" style="width: 18rem;text-decoration: none; color: black;">
+  <a href="/home/similarProgs" class="card" style="width: 18rem;text-decoration: none; color: black;">
     <img src="images/4.png" class="card-img-top" alt="...">
     <div class="card-body">
       <h6>Explore Similar Programs</h6>
@@ -40,7 +47,7 @@
     </div>
   </a>
 
-  <a href="/about"  class="card" style="width: 18rem;text-decoration: none; color: black;">
+  <a href="/about" class="card" style="width: 18rem;text-decoration: none; color: black;">
     <img src="images/5.png" class="card-img-top" alt="...">
     <div class="card-body">
       <h6>About This Project</h6>
