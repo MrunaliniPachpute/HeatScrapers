@@ -1,0 +1,26 @@
+<% if (success_msg && success_msg.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show mx-auto" role="alert" style="width: 70%; margin-top: 10px !important;  margin-bottom: 10px !important;">
+      <%= success_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<% if (error_msg && error_msg.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show mx-auto" role="alert" style="width: 70%;  margin-top: 10px !important;  margin-bottom: 10px !important;">
+      <%= error_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show mx-auto" role="alert" style="width: 70%;  margin-top: 10px !important;  margin-bottom: 10px !important;">
+      <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<script>
+
+  const alertList = document.querySelectorAll('.alert');
+  alertList.forEach(alert => new bootstrap.Alert(alert));
+</script>

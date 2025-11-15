@@ -1,0 +1,213 @@
+/* Weather Stats Card */
+.weather-stats {
+    background: #f0f8ff;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.weather-stats .card-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Horizontal row of stat boxes */
+.weather-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+/* Each stat box */
+.weather-box {
+    background: #fff;
+    flex: 1 1 150px;
+    min-width: 120px;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.weather-box:hover {
+    transform: translateY(-3px);
+}
+
+.weather-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.weather-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .weather-info-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .weather-box {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+
+.plant-suggestions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+.plant-card {
+    flex: 1 1 150px;
+    min-width: 120px;
+    background: #f0fff0;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+}
+
+.plant-card:hover {
+    transform: translateY(-3px);
+}
+
+.plant-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+.plant-card {
+  width: 220px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.plant-card:hover {
+  transform: translateY(-5px);
+}
+
+.plant-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.reason {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+#loadPlantsBtn {
+  background-color: #28a745;   /* green / eco theme */
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+#loadPlantsBtn:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+#loadPlantsBtn:active {
+  transform: translateY(0px);
+  box-shadow: none;
+}
+#loadPlantsBtn.loading {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.user-dashboard {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.points-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.points-box {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 15px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+
+.points-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.points-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #052c65;
+  margin-top: 5px;
+}
+
+.history-title {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.history-table th, .history-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+  background-color: #676881;
+  color: white;
+  font-weight: 500;
+}
+
+.history-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}

@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "v22.12.0"
+  },
   "name": "heatscrapers",
   "version": "1.0.0",
   "description": "Heat Catography project",
@@ -9,9 +12,20 @@
   "author": "Mrunalini",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.0",
+    "connect-flash": "^0.1.1",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-ejs-layouts": "^2.5.1"
+    "express-ejs-layouts": "^2.5.1",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.18.2",
+    "mongoose": "^8.19.3",
+    "node-fetch": "^2.7.0",
+    "openai": "^6.9.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "twilio": "^5.10.5"
   }
 }

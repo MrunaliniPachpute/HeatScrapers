@@ -1,1 +1,48 @@
-<h1>Heatmaps page</h1>
+<h2 class="animated-heading">Mapping the Pulses of Heat</h2>
+<p style="color: rgb(190, 189, 189);"><i>Each city has a heartbeat — we’re just learning to listen to the heat.</i></p>
+<!-- SEARCHBAR TO SEARCH AND DISPLAY HEATMAP ACC TO PLACE INPUT -->
+ <form id="searchViewHeatMapForm" class="searchViewHeatMapForm">
+  <input type="text" id="viewHeatMapPlace" placeholder="Locate any place..." class="searchViewHeatMapInput" required>
+  <button type="submit" class="search-btn">Search</button>
+</form>
+
+<div id="placeStats" class="place-stats"></div>
+
+<div class="Heatmap_temp">
+  <div id="Heatmap"></div>
+  <div id="HeatmapLegend" class="heatmap-legend"></div>
+</div>
+
+<!-- HEAT CALENDER TIMELINE SECTION -->
+<section id="heatTimelineSection" class="heat-timeline-section">
+  <h3>📆 Evolution Timeline</h3>
+  <p class="timeline-subtitle">
+    Slide through the years to see how heat intensity has changed over time through interactive charts and thermal snapshots.
+  </p>
+
+  <!-- Year Slider -->
+  <div class="slider-container">
+    <input type="range" min="2015" max="2025" value="2020" class="year-slider" id="yearSlider" />
+    <span id="yearValue" class="year-value">2020</span>
+  </div>
+
+  <!-- Heat Calendar -->
+   <div id="calendarContainer">
+  <div id="heatCalendar" class="heat-calendar"></div>
+  <div id="heatLegend"></div> <!-- Legend will render here -->
+</div>
+</section>
+<h3 style="text-align:center; font-weight:600; margin-top:30px;">
+  Glimpse of City Heat Visualizations
+</h3>
+<div class="scrolling-gallery">
+  <div class="scrolling-track">
+    <img src="/images/3.png" class="gallery-img" alt="HeatmapImg1">
+    <img src="/images/6.png" class="gallery-img" alt="HeatmapImg2">
+    <img src="/images/7.png" class="gallery-img" alt="HeatmapImg3">
+    <!-- duplicate images for smooth looping -->
+    <img src="/images/3.png" class="gallery-img" alt="HeatmapImg1">
+    <img src="/images/6.png" class="gallery-img" alt="HeatmapImg2">
+    <img src="/images/7.png" class="gallery-img" alt="HeatmapImg3">
+  </div>
+</div>

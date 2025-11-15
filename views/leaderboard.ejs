@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="/css/leaderboard.css" />
+
+<div class="leaderboard-container">
+  <!-- Heading -->
+  <div class="leaderboard-header">
+    <h1>🏆 Community Leaderboard</h1>
+    <p class="leaderboard-subtitle">
+      See how our community is contributing! Every point counts towards a cooler tomorrow.
+    </p>
+  </div>
+
+  <!-- Leaderboard Table -->
+  <div class="leaderboard-table-container">
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>User</th>
+          <th>Total Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% leaderboard.forEach((user, index) => { %>
+          <tr class="<%= user._id.equals(currentUserId) ? 'highlight' : '' %>">
+            <td><%= index + 1 %></td>
+            <td><%= user.username %></td>
+            <td><%= user.totalPoints %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

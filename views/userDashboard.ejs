@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="/css/userDash.css" />
+<div class="container mt-5">
+  <h2>Welcome, <%= user.username %>!</h2>
+
+  <!-- User Location & Weather Stats -->
+  <div class="card mb-4 weather-stats">
+  <div class="card-body">
+    <h5 class="card-title">Weather at Your Location: <%= user.location %></h5>
+    <div class="weather-info-row">
+
+      <div class="weather-box">
+        <p class="weather-label">Temperature</p>
+        <p class="weather-value"><%= weather.temperature %>°C</p>
+      </div>
+
+      <div class="weather-box">
+        <p class="weather-label">Feels Like</p>
+        <p class="weather-value"><%= weather.feelsLike %>°C</p>
+      </div>
+
+      <div class="weather-box">
+        <p class="weather-label">Humidity</p>
+        <p class="weather-value"><%= weather.humidity %>%</p>
+      </div>
+
+      <div class="weather-box">
+        <p class="weather-label">Wind Speed</p>
+        <p class="weather-value"><%= weather.windSpeed %> m/s</p>
+      </div>
+
+      <div class="weather-box">
+        <p class="weather-label">Condition</p>
+        <p class="weather-value"><%= weather.condition %></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<button id="loadPlantsBtn">Get Plant Suggestions for you!</button>
+
+<div class="plant-suggestions-row" id="plantContainer">
+  <!-- Will fill dynamically -->
+</div>
+
+
+  <!-- IoT / Plant Care Section -->
+   <br>
+  <h3>Plant Care / IoT Status- shade status</h3>
+  <div style="width: 100%; display: flex; align-items: center; justify-content: center;">
+    <div class="shade_status" style="height: 200px; width: 500px; background-color: rgb(196, 193, 193); border: 1px solid black; border-radius: 10px;">
+  </div>
+  </div>
+  <br>
+
+  <!-- User Dashboard: Points & History -->
+<div class="user-dashboard">
+  <h3>Points Summary</h3>
+  <div class="points-summary">
+    <div class="points-box">
+      <p class="points-label">Total Points Earned</p>
+      <p class="points-value"><%= totalPoints %> pts</p>
+    </div>
+    <div class="points-box">
+      <p class="points-label">Total Submissions</p>
+      <p class="points-value"><%= submissions.length %></p>
+    </div>
+  </div>
+
+  <h4 class="history-title">Submission History</h4>
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Temperature (°C)</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% submissions.forEach(sub => { %>
+        <tr>
+          <td><%= sub.date %></td>
+          <td><%= sub.temperature %></td>
+          <td><%= sub.points %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+document.getElementById("loadPlantsBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("loadPlantsBtn");
+
+  btn.disabled = true;
+  btn.classList.add("loading");
+  btn.textContent = "Loading...";
+
+  const plantContainer = document.getElementById("plantContainer");
+
+  try {
+    const res = await fetch("/user/get-plants");
+    const data = await res.json();
+
+    plantContainer.innerHTML = "";
+
+    data.plants.forEach(plant => {
+      plantContainer.innerHTML += `
+        <div class="plant-card">
+          <h5>${plant.name}</h5>
+          <p class="reason">${plant.reason}</p>
+          <img src="${plant.image}" alt="${plant.name}" />
+        </div>
+      `;
+    });
+
+    btn.textContent = "Loaded ✔";
+  } catch (err) {
+    plantContainer.innerHTML = "<p>Error loading plants.</p>";
+    btn.textContent = "Retry";
+    btn.disabled = false;
+  }
+});
+</script>

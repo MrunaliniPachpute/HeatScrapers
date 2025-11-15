@@ -1,58 +1,181 @@
-<form id="searchForm" class="search-form">
-  <input type="text" id="searchedPlace" placeholder="Locate any place..." class="search-input" required>
-  <button type="submit" class="search-btn">Search</button>
-</form>
+<!-- FLASH MESSAGE -->
+<div id="flashMsg" class="flash-msg hidden"></div>
 
+<div>
+  <!-- LEFT SIDEBAR -->
+  <div class="left-sidebar a">
+    <h3>Submit Today's Temperature</h3>
 
-<div class="map_temp">
-  <div id="map"></div>
+    <form id="tempForm">
+      <input type="number" id="tempInput" placeholder="Today's temp (°C)" required />
+      <button type="submit" id="tempBtn">Submit</button>
+    </form>
+
+    <p id="tempMessage" class="msg"></p>
+  </div>
+  <div class="left-sidebar b" id="board" style="margin-top: 250px; background-color:linear-gradient(135deg, #a8edea, #2a9d8f)"; >
+    <p style="font-size: 16px; font-weight: 500; color: #2a9d8f; text-align: center; margin-top: 10px; font-style: italic;">
+  Every point you earn today builds a cooler tomorrow
+</p>
+    <button id="leaderboardBtn" class="leaderboard-btn">
+  <i class="fa-solid fa-bullhorn"></i> Community Leaderboard
+</button>
+
+  </div>
+
+  <!-- SEARCH BAR -->
+  <form id="searchForm" class="search-form">
+    <input
+      type="text"
+      id="searchedPlace"
+      placeholder="Locate any place..."
+      class="search-input"
+      required
+    />
+    <button type="submit" class="search-btn">Search</button>
+  </form>
+
+  <!-- MAP -->
+  <div class="map_temp">
+    <div id="map"></div>
+  </div>
 </div>
 
 <!-- CARDS SECTION -->
 <div class="cards-container">
-
-  <a href="/home/viewHeatMap" class="card" style="width: 18rem; text-decoration: none; color: black;">
-    <img src="/images/1.jpg" class="card-img-top" alt="...">
+  <a href="/home/viewHeatMap" class="card" style="width: 18rem; text-decoration: none; color: black">
+    <img src="/images/1.jpg" class="card-img-top" alt="..." />
     <div class="card-body">
-      <h6>View Heat Map</h6>
-      <p class="card-text">Explore real-time surface temperature and thermal zones of any city using satellite data and
-        visualization tools.</p>
+      <h6>View Heat Map and Explore Timeline</h6>
+      <p class="card-text">
+        Explore heat intensity and yearly temperature trends through interactive
+        maps, time-travel calender and satellite-based analytics.
+      </p>
     </div>
   </a>
 
-  <a href="/home/compareCities" class="card" style="width: 18rem; text-decoration: none; color: black;">
-    <img src="/images/2.png" class="card-img-top" alt="...">
+  <a href="/home/compareCities" class="card" style="width: 18rem; text-decoration: none; color: black">
+    <img src="/images/2.png" class="card-img-top" alt="..." />
     <div class="card-body">
       <h6>Compare Cities</h6>
-      <p class="card-text">Analyze and compare urban heat patterns between two locations to understand how geography and
-        development impact temperature.</p>
+      <p class="card-text">
+        Analyze and compare urban heat patterns between two locations to
+        understand how geography and development impact temperature.
+      </p>
     </div>
   </a>
 
-  <a href="/home/timeLine" class="card" style="width: 18rem;text-decoration: none; color: black;">
-    <img src="images/3.png" class="card-img-top" alt="...">
-    <div class="card-body">
-      <h6>Evolution Timeline of your city</h6>
-      <p class="card-text">See how your city’s heat intensity has changed over time through interactive charts and
-        thermal snapshots.</p>
-    </div>
-  </a>
-
-  <a href="/home/similarProgs" class="card" style="width: 18rem;text-decoration: none; color: black;">
-    <img src="images/4.png" class="card-img-top" alt="...">
+  <a href="/home/similarProgs" class="card" style="width: 18rem; text-decoration: none; color: black">
+    <img src="/images/4.png" class="card-img-top" alt="..." />
     <div class="card-body">
       <h6>Explore Similar Programs</h6>
-      <p class="card-text">Discover other global initiatives and research projects focused on tackling urban heat and
-        promoting sustainable cooling.</p>
-    </div>
-  </a>
-
-  <a href="/about" class="card" style="width: 18rem;text-decoration: none; color: black;">
-    <img src="images/5.png" class="card-img-top" alt="...">
-    <div class="card-body">
-      <h6>About This Project</h6>
-      <p class="card-text">Learn about the concept, data sources, and Azure-powered technologies behind the Urban Heat
-        Cartographer platform.</p>
+      <p class="card-text">
+        Discover global initiatives and research efforts dedicated to advancing
+        sustainable cooling and urban heat resilience.
+      </p>
     </div>
   </a>
 </div>
+
+<!-- JS: LOCK FORM + API SUBMIT -->
+<script>
+const form = document.getElementById("tempForm");
+const input = document.getElementById("tempInput");
+const btn = document.getElementById("tempBtn");
+const msg = document.getElementById("tempMessage");
+const flash = document.getElementById("flashMsg");
+
+function showFlash(message, success = true) {
+  flash.textContent = message;
+  flash.classList.remove("hidden");
+  flash.style.background = success ? "#4caf50" : "#e63946";
+
+  setTimeout(() => {
+    flash.classList.add("hidden");
+  }, 3000);
+}
+
+function lockForm() {
+  btn.disabled = true;
+  input.disabled = true;
+  msg.textContent = "You can submit again tomorrow.";
+  localStorage.setItem("tempLockedUntil", Date.now() + 2 * 60 * 1000);
+}
+
+function unlockForm() {
+  btn.disabled = false;
+  input.disabled = false;
+  msg.textContent = "";
+  localStorage.removeItem("tempLockedUntil");
+}
+
+// Check lock on load
+(function checkLock() {
+  const lockTime = localStorage.getItem("tempLockedUntil");
+  if (!lockTime) return;
+  
+  const remaining = lockTime - Date.now();
+  if (remaining > 0) {
+    lockForm();
+    setTimeout(unlockForm, remaining);
+  } else {
+    unlockForm();
+  }
+})();
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const temperature = input.value;
+
+  const res = await fetch("/user/submit-temperature", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ temperature })
+  });
+
+  const data = await res.json();
+
+  msg.textContent = data.message;
+
+  if (data.success) {
+    showFlash("1 Point Added! Thanks for contributing.");
+    launchConfetti();
+    lockForm();
+    setTimeout(unlockForm, 2 * 60 * 1000);
+  }
+});
+</script>
+
+<!-- CONFETTI -->
+<script>
+function launchConfetti() {
+  const duration = 2000;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    confetti({
+      particleCount: 5,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 5,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 }
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+}
+</script>
+<script>
+  document.getElementById("leaderboardBtn").addEventListener("click", () => {
+  window.location.href = "/home/community/leaderboard";
+});
+
+</script>
