@@ -1,1 +1,265 @@
-<h1>Compare cities page</h1>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 10px; }
+    p.lead { text-align: center; color: #555; margin-bottom: 30px; }
+    .compare-form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .compare-form input {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .compare-form button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      background: linear-gradient(90deg, #f3722c, #f94144);
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .city-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 250px;
+      text-align: center;
+    }
+    .city-card h3 { margin: 0 0 10px; }
+    .city-card p { margin: 6px 0; color: #555; }
+    .error { text-align: center; color: red; margin-top: 15px; }
+    #chartContainer { max-width: 900px; margin: 40px auto; }
+
+    .charts-row {
+      display: none; /* hidden initially */
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .charts-row > div {
+      width: 400px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 900px){
+      .charts-row > div { width: 90%; }
+    }
+
+    .charts-row {
+  display: none; /* hidden initially */
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.chart-box {
+  width: 400px;
+  height: 400px; /* make boxes bigger */
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically */
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 900px){
+  .chart-box { width: 90%; height: 350px; }
+}
+
+  </style>
+
+  <h1>Compare Cities</h1>
+  <p class="lead">Analyze and compare urban heat patterns between two locations to understand how geography and development impact temperature.</p>
+
+  <div class="compare-form">
+    <input type="text" id="city1" placeholder="Enter first city" required>
+    <input type="text" id="city2" placeholder="Enter second city" required>
+    <button id="compareBtn">Compare</button>
+  </div>
+
+  <div class="error" id="errorMsg"></div>
+  <div class="stats-container" id="statsContainer"></div>
+
+  <div id="chartContainer">
+    <canvas id="tempChart"></canvas>
+  </div>
+
+  <!-- Additional charts: Bar and Pie -->
+  <div class="charts-row" id="additionalCharts">
+    <div class="chart-box">
+      <canvas id="barChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const compareBtn = document.getElementById("compareBtn");
+    const city1Input = document.getElementById("city1");
+    const city2Input = document.getElementById("city2");
+    const statsContainer = document.getElementById("statsContainer");
+    const errorMsg = document.getElementById("errorMsg");
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    const additionalCharts = document.getElementById('additionalCharts');
+
+    let tempChart, barChart, pieChart;
+
+    async function fetchCityData(city, historical=false) {
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`);
+        const geoData = await geoRes.json();
+        if (!geoData.length) throw new Error("City not found");
+
+        const lat = geoData[0].lat;
+        const lon = geoData[0].lon;
+
+        if (!historical) {
+          const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+          const weatherData = await weatherRes.json();
+          return {
+            city: city,
+            lat,
+            lon,
+            temperature: weatherData.current_weather?.temperature || "N/A",
+            windspeed: weatherData.current_weather?.windspeed || "N/A",
+            weathercode: weatherData.current_weather?.weathercode || "N/A"
+          };
+        } else {
+          const endDate = new Date();
+          const startDate = new Date();
+          startDate.setDate(endDate.getDate() - 6);
+          const startStr = startDate.toISOString().split("T")[0];
+          const endStr = endDate.toISOString().split("T")[0];
+
+          const histRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${startStr}&end_date=${endStr}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+          const histData = await histRes.json();
+          return {
+            city,
+            dates: histData.daily?.time || [],
+            tempMax: histData.daily?.temperature_2m_max || [],
+            tempMin: histData.daily?.temperature_2m_min || []
+          };
+        }
+      } catch (err) {
+        console.error(err);
+        return { city, error: err.message };
+      }
+    }
+
+    compareBtn.addEventListener("click", async () => {
+      const city1 = city1Input.value.trim();
+      const city2 = city2Input.value.trim();
+      errorMsg.textContent = "";
+      statsContainer.innerHTML = "";
+      if (tempChart) tempChart.destroy();
+      if (barChart) barChart.destroy();
+      if (pieChart) pieChart.destroy();
+      additionalCharts.style.display = 'none';
+
+      if (!city1 || !city2) {
+        errorMsg.textContent = "Please enter both cities!";
+        return;
+      }
+
+      // Fetch current stats
+      const results = await Promise.all([fetchCityData(city1), fetchCityData(city2)]);
+      results.forEach(data => {
+        const card = document.createElement("div");
+        card.classList.add("city-card");
+        if (data.error) {
+          card.innerHTML = `<h3>${data.city}</h3><p style="color:red;">${data.error}</p>`;
+        } else {
+          card.innerHTML = `
+            <h3>${data.city}</h3>
+            <p>Temperature: ${data.temperature}°C</p>
+            <p>Wind Speed: ${data.windspeed} km/h</p>
+            <p>Weather Code: ${data.weathercode}</p>
+          `;
+        }
+        statsContainer.appendChild(card);
+      });
+
+      // Fetch historical data for line chart
+      const histData = await Promise.all([fetchCityData(city1, true), fetchCityData(city2, true)]);
+      const labels = histData[0].dates;
+
+      tempChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: histData[0].city + " Max Temp", data: histData[0].tempMax, borderColor: '#f3722c', backgroundColor: 'rgba(243,114,44,0.2)', fill: true },
+            { label: histData[0].city + " Min Temp", data: histData[0].tempMin, borderColor: '#f94144', backgroundColor: 'rgba(249,65,68,0.2)', fill: true },
+            { label: histData[1].city + " Max Temp", data: histData[1].tempMax, borderColor: '#2a9d8f', backgroundColor: 'rgba(42,157,143,0.2)', fill: true },
+            { label: histData[1].city + " Min Temp", data: histData[1].tempMin, borderColor: '#264653', backgroundColor: 'rgba(38,70,83,0.2)', fill: true }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' }, title: { display: true, text: '7-Day Temperature Comparison' } },
+          scales: { y: { beginAtZero: false, title: { display: true, text: 'Temperature (°C)' } } }
+        }
+      });
+
+      // Compute averages for additional charts
+      const avgMax1 = histData[0].tempMax.reduce((a,b)=>a+b,0)/histData[0].tempMax.length;
+      const avgMax2 = histData[1].tempMax.reduce((a,b)=>a+b,0)/histData[1].tempMax.length;
+      const avgMin1 = histData[0].tempMin.reduce((a,b)=>a+b,0)/histData[0].tempMin.length;
+      const avgMin2 = histData[1].tempMin.reduce((a,b)=>a+b,0)/histData[1].tempMin.length;
+
+      // Bar chart: Average Max Temp
+      barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: [histData[0].city, histData[1].city],
+          datasets: [{ label: 'Average Max Temp (°C)', data: [avgMax1, avgMax2], backgroundColor: ['#f3722c','#2a9d8f'] }]
+        },
+        options: { responsive:true, plugins:{ title:{display:true,text:'Average Max Temperature Comparison'} }, scales:{ y:{beginAtZero:true} } }
+      });
+
+      // Pie chart: Proportion of Min Temp
+      pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: [histData[0].city, histData[1].city],
+          datasets: [{ data: [avgMin1, avgMin2], backgroundColor: ['#f94144','#264653'] }]
+        },
+        options: { responsive:true, plugins:{ title:{display:true,text:'Average Min Temperature Proportion'} } }
+      });
+
+      // Show additional charts
+      additionalCharts.style.display = 'flex';
+    });
+  </script>
+

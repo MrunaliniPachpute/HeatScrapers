@@ -1,0 +1,95 @@
+body {
+  background: #0f1720;
+  color: #e6eef6;
+  font-family: "Inter", sans-serif;
+}
+
+.contact-hero {
+  background: linear-gradient(180deg, rgba(243,114,44,0.12), rgba(217,50,45,0.06));
+  padding: 60px 0;
+  text-align: left;
+}
+
+.contact-hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.contact-hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.contact-hero .lead {
+  color: #b9bdc6;
+  margin-bottom: 16px;
+}
+
+.btn-primary-cta {
+  background: linear-gradient(90deg, #f3722c, #f94144);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.contact-section {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 16px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.about-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+
+.about-card h3 {
+  margin-top: 10px;
+  color: #fff;
+}
+
+.about-card p {
+  color: #b9bdc6;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #e6eef6;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.msg {
+  margin-top: 0.5rem;
+  font-weight: 500;
+  color: #4caf50;
+}
+
+.contact-grid i {
+  font-size: 1.5rem;
+  color: #f3722c;
+}

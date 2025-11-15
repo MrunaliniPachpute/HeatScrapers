@@ -13,25 +13,19 @@
 
     <p id="tempMessage" class="msg"></p>
   </div>
-  <div class="left-sidebar b" id="board" style="margin-top: 250px; background-color:linear-gradient(135deg, #a8edea, #2a9d8f)"; >
-    <p style="font-size: 16px; font-weight: 500; color: #2a9d8f; text-align: center; margin-top: 10px; font-style: italic;">
-  Every point you earn today builds a cooler tomorrow
-</p>
-    <button id="leaderboardBtn" class="leaderboard-btn">
-  <i class="fa-solid fa-bullhorn"></i> Community Leaderboard
-</button>
 
+  <div class="left-sidebar b" id="board" style="margin-top: 250px; background: linear-gradient(135deg, #d9dfdf, #a6a8a8);">
+    <p style="font-size: 16px; font-weight: 500; color: #1b1d1d; text-align: center; margin-top: 10px; font-style: italic;">
+      Every point you earn today builds a cooler tomorrow
+    </p>
+    <button id="leaderboardBtn" class="leaderboard-btn">
+      <i class="fa-solid fa-bullhorn"></i> Community Leaderboard
+    </button>
   </div>
 
   <!-- SEARCH BAR -->
   <form id="searchForm" class="search-form">
-    <input
-      type="text"
-      id="searchedPlace"
-      placeholder="Locate any place..."
-      class="search-input"
-      required
-    />
+    <input type="text" id="searchedPlace" placeholder="Locate any place..." class="search-input" required />
     <button type="submit" class="search-btn">Search</button>
   </form>
 
@@ -48,8 +42,7 @@
     <div class="card-body">
       <h6>View Heat Map and Explore Timeline</h6>
       <p class="card-text">
-        Explore heat intensity and yearly temperature trends through interactive
-        maps, time-travel calender and satellite-based analytics.
+        Explore heat intensity and yearly temperature trends through interactive maps, time-travel calendar, and satellite-based analytics.
       </p>
     </div>
   </a>
@@ -59,8 +52,7 @@
     <div class="card-body">
       <h6>Compare Cities</h6>
       <p class="card-text">
-        Analyze and compare urban heat patterns between two locations to
-        understand how geography and development impact temperature.
+        Analyze and compare urban heat patterns between two locations to understand how geography and development impact temperature.
       </p>
     </div>
   </a>
@@ -70,8 +62,7 @@
     <div class="card-body">
       <h6>Explore Similar Programs</h6>
       <p class="card-text">
-        Discover global initiatives and research efforts dedicated to advancing
-        sustainable cooling and urban heat resilience.
+        Discover global initiatives and research efforts dedicated to advancing sustainable cooling and urban heat resilience.
       </p>
     </div>
   </a>
@@ -89,93 +80,68 @@ function showFlash(message, success = true) {
   flash.textContent = message;
   flash.classList.remove("hidden");
   flash.style.background = success ? "#4caf50" : "#e63946";
-
-  setTimeout(() => {
-    flash.classList.add("hidden");
-  }, 3000);
+  setTimeout(() => flash.classList.add("hidden"), 3000);
 }
 
-function lockForm() {
-  btn.disabled = true;
-  input.disabled = true;
-  msg.textContent = "You can submit again tomorrow.";
-  localStorage.setItem("tempLockedUntil", Date.now() + 2 * 60 * 1000);
-}
+async function checkSubmission() {
+  try {
+    const res = await fetch("/user/check-today-submission");
+    const data = await res.json();
 
-function unlockForm() {
-  btn.disabled = false;
-  input.disabled = false;
-  msg.textContent = "";
-  localStorage.removeItem("tempLockedUntil");
-}
-
-// Check lock on load
-(function checkLock() {
-  const lockTime = localStorage.getItem("tempLockedUntil");
-  if (!lockTime) return;
-  
-  const remaining = lockTime - Date.now();
-  if (remaining > 0) {
-    lockForm();
-    setTimeout(unlockForm, remaining);
-  } else {
-    unlockForm();
+    if (data.submitted) {
+      btn.disabled = true;
+      input.disabled = true;
+      msg.textContent = "You have already submitted today.";
+    }
+  } catch (err) {
+    console.error("Failed to check submission:", err);
   }
-})();
+}
+
+// Run on page load
+checkSubmission();
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const temperature = input.value;
 
-  const res = await fetch("/user/submit-temperature", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ temperature })
-  });
+  try {
+    const res = await fetch("/user/submit-temperature", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ temperature })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
+    msg.textContent = data.message;
 
-  msg.textContent = data.message;
-
-  if (data.success) {
-    showFlash("1 Point Added! Thanks for contributing.");
-    launchConfetti();
-    lockForm();
-    setTimeout(unlockForm, 2 * 60 * 1000);
+    if (data.success) {
+      showFlash("1 Point Added! Thanks for contributing.");
+      btn.disabled = true;
+      input.disabled = true;
+      launchConfetti();
+    }
+  } catch (err) {
+    console.error("Error submitting temperature:", err);
+    showFlash("Server error. Try again later.", false);
   }
 });
-</script>
 
-<!-- CONFETTI -->
-<script>
+// CONFETTI
 function launchConfetti() {
   const duration = 2000;
   const end = Date.now() + duration;
 
   (function frame() {
-    confetti({
-      particleCount: 5,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 }
-    });
-    confetti({
-      particleCount: 5,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 }
-    });
+    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
 
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
+    if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }
-</script>
-<script>
-  document.getElementById("leaderboardBtn").addEventListener("click", () => {
+
+// Leaderboard button
+document.getElementById("leaderboardBtn").addEventListener("click", () => {
   window.location.href = "/home/community/leaderboard";
 });
-
 </script>

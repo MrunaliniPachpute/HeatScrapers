@@ -1,0 +1,79 @@
+  <link rel="stylesheet" href="/css/contact.css" />
+
+<div class="contact-hero">
+  <div class="contact-hero-inner">
+    <h1>Contact Us</h1>
+    <p class="lead">Questions, feedback, or collaboration ideas? We’d love to hear from you.</p>
+    <a href="#contactForm" class="btn-primary-cta">Send a Message</a>
+  </div>
+</div>
+
+<div class="contact-section">
+  <div class="contact-grid">
+    <!-- Contact Info -->
+    <div class="contact-info">
+      <div class="about-card">
+        <i class="fa-solid fa-envelope"></i>
+        <h3>Email</h3>
+        <p>support@heatscrapers.com</p>
+      </div>
+      <div class="about-card">
+        <i class="fa-solid fa-phone"></i>
+        <h3>Phone</h3>
+        <p>+91 98765 43210</p>
+      </div>
+      <div class="about-card">
+        <i class="fa-solid fa-location-dot"></i>
+        <h3>Address</h3>
+        <p>Pune, Maharashtra, India</p>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form about-card">
+      <form id="contactForm" method="POST" action="/contact/submit">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" placeholder="John Doe" required />
+
+        <label for="email">Your Email</label>
+        <input type="email" id="email" name="email" placeholder="john@example.com" required />
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+
+        <button type="submit" class="btn-primary-cta">Send Message</button>
+      </form>
+      <p id="contactMsg" class="msg"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("contactForm");
+  const contactMsg = document.getElementById("contactMsg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = {
+      name: form.name.value,
+      email: form.email.value,
+      message: form.message.value,
+    };
+
+    try {
+      const res = await fetch("/contact/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      contactMsg.textContent = data.message;
+      contactMsg.style.color = data.success ? "#4caf50" : "#f94144";
+      if (data.success) form.reset();
+    } catch (err) {
+      contactMsg.textContent = "Something went wrong. Please try again.";
+      contactMsg.style.color = "#f94144";
+    }
+  });
+</script>
+

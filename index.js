@@ -8,7 +8,7 @@ const passport = require("passport");
 const flash = require("connect-flash");
 const { AzureOpenAI } = require("openai");
 
-const twilio = require('twilio');
+const twilio = require("twilio");
 
 const User = require("./models/User");
 const Temperature = require("./models/Temperature");
@@ -17,7 +17,7 @@ PORT = 3000;
 const fetch = require("node-fetch");
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
-const client = require('twilio')(accountSid, authToken);
+const client = require("twilio")(accountSid, authToken);
 
 require("./config/passport")(passport);
 
@@ -64,25 +64,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/send-sms", (req, res) => {
-  client.messages
-    .create({
-      body: "Hello! This is a test SMS from my Node.js app. hehe",
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: "+918999464235"
-    })
-    .then(message => res.send("SMS sent! SID: " + message.sid))
-    .catch(err => res.status(500).send("Failed to send SMS: " + err.message));
-});
-
+app.get("/send-sms", (req, res) => {});
 
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    req.flash("error_msg" , "Login to view this page!");
-    return res.redirect("/user/login");
+  if (req.isAuthenticated()) {
+    return next();
   }
+  req.flash("error_msg", "Login to view this page!");
+  return res.redirect("/user/login");
+}
 
 app.get("/", (req, res) => {
   res.send("Server working well...");
@@ -91,7 +81,8 @@ app.get("/", (req, res) => {
 app.get("/user/signup", (req, res) => res.render("signUp"));
 
 app.post("/user/signup", async (req, res, next) => {
-  const { location, email, username, password, confirmPassword } = req.body;
+  const { location, phoneNumber, email, username, password, confirmPassword } =
+    req.body;
 
   try {
     if (password !== confirmPassword) {
@@ -106,7 +97,7 @@ app.post("/user/signup", async (req, res, next) => {
     }
 
     // Create new user
-    user = new User({ location, email, username, password });
+    user = new User({ location, phoneNumber, email, username, password });
     await user.save();
 
     // Automatically log in the user
@@ -221,7 +212,6 @@ app.get("/user/get-plants", async (req, res) => {
   }
 });
 
-
 app.get("/user/dashboard", async (req, res) => {
   if (!req.isAuthenticated()) {
     req.flash("error_msg", "Login to view your dashboard.");
@@ -234,49 +224,49 @@ app.get("/user/dashboard", async (req, res) => {
 
   let weather = {};
 
-  // try {
-  //     // Extract city,state from user.location
-  //     let locParts = user.location.split(",");
-  //     const city = locParts[0].trim();
-  //     const state = locParts[1] ? locParts[1].trim() : "";
-  //     const query = `${city},${state}`;
+  try {
+      // Extract city,state from user.location
+      let locParts = user.location.split(",");
+      const city = locParts[0].trim();
+      const state = locParts[1] ? locParts[1].trim() : "";
+      const query = `${city},${state}`;
 
-  //     const geoRes = await fetch(
-  //         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
-  //     );
-  //     const geoData = await geoRes.json();
-  //     if (!geoData.length) throw new Error("Location not found");
+      const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
+      );
+      const geoData = await geoRes.json();
+      if (!geoData.length) throw new Error("Location not found");
 
-  //     const lat = geoData[0].lat;
-  //     const lon = geoData[0].lon;
+      const lat = geoData[0].lat;
+      const lon = geoData[0].lon;
 
-  //     const url = `https://atlas.microsoft.com/weather/currentConditions/json?subscription-key=${process.env.AZURE_MAP_KEY}&api-version=1.0&query=${lat},${lon}`;
-  //     const response = await fetch(url);
-  //     const data = await response.json();
+      const url = `https://atlas.microsoft.com/weather/currentConditions/json?subscription-key=${process.env.AZURE_MAP_KEY}&api-version=1.0&query=${lat},${lon}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-  //     console.log('Azure API response:', data);
+      console.log('Azure API response:', data);
 
-  //     if (data && data.results && data.results.length > 0) {
-  //         const w = data.results[0];
-  //         weather.temperature = w.temperature?.value;
-  //         weather.feelsLike = w.apparentTemperature?.value;
-  //         weather.humidity = w.relativeHumidity;
-  //         weather.windSpeed = w.wind?.speed?.value;
-  //         weather.condition = w.cloudCover === 0 ? 'Clear' : 'Cloudy';
-  //     }
+      if (data && data.results && data.results.length > 0) {
+          const w = data.results[0];
+          weather.temperature = w.temperature?.value;
+          weather.feelsLike = w.apparentTemperature?.value;
+          weather.humidity = w.relativeHumidity;
+          weather.windSpeed = w.wind?.speed?.value;
+          weather.condition = w.cloudCover === 0 ? 'Clear' : 'Cloudy';
+      }
 
-  // } catch(err) {
-  //     console.error('Azure Maps Weather API error:', err);
-  // }
-  weather.temperature = 27;
-  weather.feelsLike = 25;
-  weather.humidity = 41;
-  weather.windSpeed = 10.7;
-  weather.condition = "Cloudy";
+  } catch(err) {
+      console.error('Azure Maps Weather API error:', err);
+  }
 
-    const userId = req.user._id;
-    const submissions = await Temperature.find({ user: userId }).sort({ date: -1 });
-    const totalPoints = submissions.reduce((acc, cur) => acc + (cur.points || 0), 0);
+  const userId = req.user._id;
+  const submissions = await Temperature.find({ user: userId }).sort({
+    date: -1,
+  });
+  const totalPoints = submissions.reduce(
+    (acc, cur) => acc + (cur.points || 0),
+    0
+  );
 
   res.render("userDashboard", {
     user,
@@ -296,32 +286,38 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get(
+  "/home/community/leaderboard",
+  ensureAuthenticated,
+  async (req, res) => {
+    try {
+      const users = await User.find({}).select("username").lean();
 
-app.get("/home/community/leaderboard" , ensureAuthenticated, async (req, res) => {
-  try {
-    const users = await User.find({}).select("username").lean();
+      // Calculate points for each user
+      const leaderboard = await Promise.all(
+        users.map(async (u) => {
+          const submissions = await Temperature.find({ user: u._id });
+          const totalPoints = submissions.reduce(
+            (acc, cur) => acc + (cur.points || 0),
+            0
+          );
+          return { ...u, totalPoints };
+        })
+      );
 
-    // Calculate points for each user
-    const leaderboard = await Promise.all(
-      users.map(async (u) => {
-        const submissions = await Temperature.find({ user: u._id });
-        const totalPoints = submissions.reduce((acc, cur) => acc + (cur.points || 0), 0);
-        return { ...u, totalPoints };
-      })
-    );
+      // Sort descending by points
+      leaderboard.sort((a, b) => b.totalPoints - a.totalPoints);
 
-    // Sort descending by points
-    leaderboard.sort((a, b) => b.totalPoints - a.totalPoints);
-
-    res.render("leaderboard", {
-      leaderboard,
-      currentUserId: req.user._id
-    });
-  } catch (err) {
-    console.log(err);
-    res.send("Server error");
+      res.render("leaderboard", {
+        leaderboard,
+        currentUserId: req.user._id,
+      });
+    } catch (err) {
+      console.log(err);
+      res.send("Server error");
+    }
   }
-});
+);
 
 app.get("/home", (req, res) => {
   res.render("home", { name: "Mrunalini" });
@@ -350,48 +346,6 @@ app.post("/home/search", async (req, res) => {
     res.status(500).send("Error fetching coordinates");
   }
 });
-
-
-app.post("/user/submit-temperature", ensureAuthenticated, async (req, res) => {
-  try {
-    const { temperature } = req.body;
-    const userId = req.user._id;
-
-    const today = new Date();
-    const dateStr = today.toISOString().split("T")[0];
-
-    // Check if already submitted today
-    const already = await Temperature.findOne({
-      user: userId,
-      date: dateStr
-    });
-
-    if (already) {
-      return res.json({
-        success: false,
-        message: "You already submitted today's temperature."
-      });
-    }
-
-    // Save submission
-    await Temperature.create({
-      user: userId,
-      temperature,
-      date: dateStr,
-      points: 1
-    });
-
-    res.json({
-      success: true,
-      message: "Temperature submitted! You earned 1 point."
-    });
-
-  } catch (err) {
-    console.log(err);
-    res.json({ success: false, message: "Server error" });
-  }
-});
-
 
 
 app.get("/api/yearlyHeat", (req, res) => {
@@ -529,6 +483,81 @@ app.get("/about", (req, res) => {
 app.get("/contact", (req, res) => {
   res.render("contact");
 });
+
+app.post("/user/submit-temperature", ensureAuthenticated, async (req, res) => {
+  console.log("req recieved at route");
+  try {
+    const { temperature } = req.body;
+    const userId = req.user._id;
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // Check if user already submitted today
+    const already = await Temperature.findOne({ user: userId, date: today });
+
+    if (already) {
+      return res.json({
+        success: false,
+        message: "You already submitted today's temperature.",
+      });
+    }
+
+    // Save submission
+    await Temperature.create({
+      user: userId,
+      temperature,
+      date: today,
+      points: 1,
+    });
+
+    // High temperature alert
+    const HIGH_TEMP_THRESHOLD = 40; // °C
+    if (temperature >= HIGH_TEMP_THRESHOLD && req.user.phoneNumber) {
+      const alertMessage = `⚠️ Alert from Heatscrapers: ${req.user.username}, high temperature of ${temperature}°C recorded. Stay hydrated!`;
+      try {
+        await client.messages.create({
+          body: alertMessage,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: req.user.phoneNumber,
+        });
+        console.log("ALERT MSG SENT TO NUMBER");
+      } catch (err) {
+        console.error("Failed to send SMS:", err.message);
+      }
+    }
+    console.log(req.user.phoneNumber , temperature);
+    res.json({
+      success: true,
+      message: "Temperature submitted! You earned 1 point.",
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.json({
+      success: false,
+      message: "Server error. Please try again later.",
+    });
+  }
+});
+
+app.post("/contact/submit", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.json({ success: false, message: "All fields are required." });
+    }
+
+    console.log("New contact message:", { name, email, message });
+
+    req.flash("success_msg" ,  "Thank you! Your message has been received.");
+    return res.redirect("/home");
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/home");
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`server active at http://localhost:${PORT}/home`);
